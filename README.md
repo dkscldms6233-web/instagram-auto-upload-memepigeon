@@ -1,2 +1,22 @@
-# instagram-auto-upload-memepigeon
-[인스타 자동 업로드] @_memepigeon 밈 게시물을 정해진 시간에 자동으로 올려주는 저장소 (Claude와 함께 만듦, 2026.11)
+# 인스타 자동 업로드 (@_memepigeon)
+
+세컨드 브레인 `_inbox/올릴것` 폴더의 밈 묶음을 **정해진 시간에 인스타그램에 자동으로 올려주는** 저장소예요. (Claude와 함께 만듦, 2026.11)
+
+## 어떻게 돌아가나요?
+1. `images/` 폴더에 사진, `schedule.json`에 올릴 시간·캡션이 들어 있어요.
+2. GitHub Actions가 15분마다 확인해서, 시간이 된 게시물을 인스타에 올려요. (몇 분~30분 정도 늦을 수 있어요)
+3. 올린 게시물은 `posted.json`에 기록돼서 두 번 올라가지 않아요.
+4. 인스타 토큰은 매달 1일·15일에 자동으로 연장돼요.
+
+## 파일 설명
+| 파일 | 내용 |
+|---|---|
+| `images/` | 올릴 사진 (`b02_1.jpg` = 묶음02의 1번째 사진) |
+| `schedule.json` | 게시물별 날짜·시간·캡션 |
+| `posted.json` | 이미 올린 묶음 기록 |
+| `post.py` | 실제로 인스타에 올리는 프로그램 |
+| `.github/workflows/` | 자동 실행 설정 |
+
+## 문제가 생기면
+- 상단 **Actions** 탭에서 빨간 ❌ 표시가 있는지 확인하세요.
+- 비밀값 `IG_TOKEN`(Settings → Secrets and variables → Actions)은 절대 공개하지 마세요.
