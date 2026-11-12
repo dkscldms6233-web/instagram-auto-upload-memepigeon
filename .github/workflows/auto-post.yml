@@ -16,9 +16,11 @@ jobs:
   post:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
 
@@ -28,11 +30,15 @@ jobs:
         run: python post.py
 
       - name: posted.json 기록 저장
+        if: always()   # 업로드 후 오류가 나도 기록은 남겨서 중복 업로드 방지
         run: |
           if ! git diff --quiet posted.json; then
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
             git add posted.json
             git commit -m "업로드 기록 업데이트"
-            git push
+            for i in 1 2 3; do
+              git pull --rebase origin main && git push && break
+              sleep 5
+            done
           fi
