@@ -54,21 +54,13 @@ def publish(post):
     return call("POST", f"{me}/media_publish", creation_id=c)["id"]
 
 def token_check():
-    """토큰 남은 기간 확인. 10일 안 남으면 실패(빨간 X)로 알려줘요."""
-    d = call("GET", "debug_token", input_token=TOKEN)["data"]
-    print("토큰 유효:", d.get("is_valid"), "| 권한:", ",".join(d.get("scopes", [])))
-    left = []
-    for key, label in (("expires_at", "토큰 만료"), ("data_access_expires_at", "데이터 접근 만료")):
-        t = d.get(key) or 0
-        if t:
-            days = (t - time.time()) / 86400
-            left.append(days)
-            print(f"{label}: {datetime.fromtimestamp(t, timezone.utc):%Y-%m-%d} (약 {days:.0f}일 남음)")
-        else:
-            print(f"{label}: 없음 (만료 안 됨)")
-    if not d.get("is_valid") or (left and min(left) < 10):
-        print("토큰을 새로 생성해서 IG_TOKEN 을 업데이트해 주세요!", file=sys.stderr)
+    """토큰이 아직 살아 있는지 확인. 만료됐으면 실패(빨간 X)로 알려줘요."""
+    try:
+        info = call("GET", IG_USER_ID, fields="id,username")
+    except Exception:
+        print("토큰이 만료됐거나 문제가 있어요. Meta에서 토큰을 새로 생성해 IG_TOKEN 을 업데이트해 주세요!", file=sys.stderr)
         sys.exit(1)
+    print("토큰 정상:", info.get("username"))
 
 def main():
     schedule = json.load(open("schedule.json", encoding="utf-8"))["posts"]
