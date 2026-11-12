@@ -1,0 +1,38 @@
+name: 인스타 자동 업로드
+
+on:
+  schedule:
+    - cron: "*/15 * * * *"   # 15분마다 확인
+  workflow_dispatch:          # Actions 탭에서 직접 실행 가능
+
+permissions:
+  contents: write
+
+concurrency:
+  group: auto-post
+  cancel-in-progress: false
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: 시간 된 게시물 올리기
+        env:
+          IG_TOKEN: ${{ secrets.IG_TOKEN }}
+        run: python post.py
+
+      - name: posted.json 기록 저장
+        run: |
+          if ! git diff --quiet posted.json; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add posted.json
+            git commit -m "업로드 기록 업데이트"
+            git push
+          fi
