@@ -11,6 +11,7 @@ REPO = os.environ["GITHUB_REPOSITORY"]  # 예: 사용자/저장소
 BRANCH = os.environ.get("BRANCH", "main")
 API = "https://graph.facebook.com/v23.0"
 RAW = f"https://raw.githubusercontent.com/{REPO}/{BRANCH}/"
+END_CARD = "images/end_card.jpg"  # 모든 게시물 맨 뒷장에 자동으로 붙는 팔로우 안내 사진
 
 def call(method, path, **params):
     params["access_token"] = TOKEN
@@ -39,7 +40,11 @@ def wait_ready(container_id):
 
 def publish(post):
     me = IG_USER_ID
-    urls = [RAW + urllib.parse.quote(p) for p in post["images"]]
+    images = list(post["images"])
+    # 맨 뒷장에 팔로우 안내 사진 추가 (캐러셀은 최대 10장)
+    if os.path.exists(END_CARD) and END_CARD not in images and len(images) < 10:
+        images.append(END_CARD)
+    urls = [RAW + urllib.parse.quote(p) for p in images]
     if len(urls) == 1:
         c = call("POST", f"{me}/media", image_url=urls[0], caption=post["caption"])["id"]
     else:
