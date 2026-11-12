@@ -1,4 +1,4 @@
-name: 인스타 토큰 연장
+name: 인스타 토큰 확인
 
 on:
   schedule:
@@ -9,18 +9,13 @@ jobs:
   refresh:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
 
-      - name: 토큰 확인
-        env:
-          IG_TOKEN: ${{ secrets.IG_TOKEN }}
-        run: python post.py check
-
-      - name: 토큰 연장
+      - name: 토큰 확인 (만료되면 실패 + 메일 알림)
         env:
           IG_TOKEN: ${{ secrets.IG_TOKEN }}
         run: python post.py refresh
